@@ -22,7 +22,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Generate Report
-        run: python crawler.pml   # TrendRadar 的主文件会生成日报内容
+        run: python crawler.py   # TrendRadar 的主文件会生成日报内容
 
       - name: Send Email
         uses: dawidd6/action-send-mail@v3
