@@ -1,0 +1,38 @@
+name: Daily Report
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # 每天 UTC 0 点运行（北京时间早上 8 点）
+  workflow_dispatch:     # 允许手动运行
+
+jobs:
+  send_report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate Report
+        run: python crawler.py   # TrendRadar 的主文件会生成日报内容
+
+      - name: Send Email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.EMAIL_SMTP_SERVER }}
+          server_port: ${{ secrets.EMAIL_SMTP_PORT }}
+          username: ${{ secrets.EMAIL_FROM }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "TrendRadar 每日趋势报告"
+          body: "您好，这是 TrendRadar 自动生成的每日趋势报告，请查看附件内容。"
+          to: ${{ secrets.EMAIL_TO }}
+          from: ${{ secrets.EMAIL_FROM }}
+          attachments: "report.md"
